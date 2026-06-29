@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Our Vault">
+<meta name="theme-color" content="#2d1520">
+<title>Our Vault ♥</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#2d1520;
+  --card:#3d1f2a;
+  --section:#341a24;
+  --border:rgba(220,130,155,0.22);
+  --rose:#d4537e;
+  --rose-l:#e8809e;
+  --rose-d:#993556;
+  --rose-pale:#4a2233;
+  --text:#f5e6ec;
+  --muted:#b08090;
+  --input:#2a1219;
+  --r:12px;
+  --rs:8px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-x:hidden;}
+#root{min-height:100vh;padding-bottom:5rem;}
+
+.hdr{text-align:center;padding:1.4rem 1rem .9rem;border-bottom:0.5px solid var(--border);background:var(--card);position:sticky;top:0;z-index:10;}
+.hdr h1{font-family:Georgia,serif;font-size:20px;font-weight:400;letter-spacing:.07em;color:var(--rose-l);}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;}
+.sync-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;margin-top:5px;background:rgba(100,200,120,.15);color:#7dcc90;border:0.5px solid rgba(100,200,120,.3);}
+.sync-badge.err{background:rgba(200,80,80,.15);color:#e08080;border-color:rgba(200,80,80,.3);}
+.sync-badge.loading{background:rgba(200,160,80,.12);color:#d4aa60;border-color:rgba(200,160,80,.3);}
+
+.tabs{display:flex;background:var(--card);border-bottom:0.5px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:88px;z-index:9;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:0 0 auto;min-width:70px;padding:10px 6px;font-size:10px;letter-spacing:.03em;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s,border-color .2s;}
+.tab i{font-size:17px;}
+.tab.active{color:var(--rose);border-bottom-color:var(--rose);}
+
+.sec{display:none;padding:1rem .9rem;max-width:560px;margin:0 auto;}
+.sec.active{display:block;}
+.card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:.9rem;margin-bottom:.9rem;}
+.stitle{font-family:Georgia,serif;font-size:13px;color:var(--rose-l);margin-bottom:.75rem;font-weight:400;}
+
+input[type=text],input[type=date],textarea,select{
+  width:100%;background:var(--input);border:0.5px solid var(--border);border-radius:var(--rs);
+  color:var(--text);padding:9px 12px;font-size:14px;font-family:inherit;outline:none;resize:vertical;
+  transition:border-color .2s;-webkit-appearance:none;appearance:none;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--rose);}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.5) sepia(1) saturate(2) hue-rotate(290deg);}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23b08090' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;letter-spacing:.02em;}
+.mb{margin-bottom:11px;}
+.row{display:flex;gap:8px;}
+.col{flex:1;min-width:0;}
+
+.btn{padding:10px 18px;border-radius:var(--rs);font-size:13px;cursor:pointer;border:none;font-family:inherit;font-weight:500;transition:opacity .2s,transform .1s;}
+.btn:active{transform:scale(.96);}
+.btn-r{background:var(--rose);color:#fff;}
+.btn-r:active{background:var(--rose-d);}
+.btn-g{background:none;border:0.5px solid var(--border);color:var(--muted);}
+.btn-d{background:none;border:0.5px solid rgba(200,80,100,.3);color:#c06070;font-size:11px;padding:5px 9px;border-radius:6px;cursor:pointer;}
+
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:.9rem;}
+.stat{background:var(--section);border:0.5px solid var(--border);border-radius:var(--rs);padding:10px 8px;text-align:center;}
+.stat-n{font-size:22px;font-weight:500;color:var(--rose);}
+.stat-l{font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:.03em;}
+
+.item{background:var(--section);border:0.5px solid var(--border);border-radius:var(--rs);padding:10px 12px;margin-bottom:8px;}
+.item-title{font-size:14px;color:var(--text);margin-bottom:2px;}
+.from{font-size:11px;color:var(--rose-l);margin-bottom:5px;}
+.body-text{font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;}
+.ts{font-size:10px;color:var(--muted);margin-top:5px;}
+
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;}
+.p-dream{background:rgba(200,80,120,.2);color:#e8a0b8;}
+.p-soon{background:rgba(200,140,60,.15);color:#d4aa60;}
+.p-done{background:rgba(80,180,100,.12);color:#7dcc90;}
+
+.mem-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;}
+.mem-wrap{aspect-ratio:1;border-radius:10px;overflow:hidden;position:relative;border:0.5px solid var(--border);}
+.mem-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.mem-cap{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);padding:14px 7px 6px;font-size:10px;color:#fff;}
+.mem-del{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.55);border:none;border-radius:50%;color:#e08080;width:22px;height:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;}
+
+.upload{border:1px dashed var(--border);border-radius:var(--r);padding:1.4rem;text-align:center;cursor:pointer;background:var(--rose-pale);margin-bottom:.9rem;}
+.upload p{font-size:12px;color:var(--muted);margin-top:6px;}
+.upload-icon{font-size:26px;color:var(--rose-l);}
+
+.empty{text-align:center;padding:2rem .5rem;color:var(--muted);font-size:13px;}
+.empty-icon{font-size:32px;display:block;margin-bottom:8px;opacity:.3;}
+
+.anni{background:var(--rose-pale);border:0.5px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;margin-bottom:.9rem;}
+.anni-n{font-size:32px;font-weight:500;color:var(--rose-l);}
+.anni-l{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6;}
+
+.song-item{display:flex;align-items:flex-start;gap:10px;}
+.song-icon{width:38px;height:38px;border-radius:var(--rs);background:var(--rose-pale);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;color:var(--rose-l);}
+
+.wish-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border);}
+.wish-row:last-child{border-bottom:none;}
+.wish-cb{accent-color:var(--rose);width:17px;height:17px;cursor:pointer;flex-shrink:0;}
+.cb{accent-color:var(--rose);width:17px;height:17px;cursor:pointer;flex-shrink:0;margin-top:2px;}
+
+.letter-body{font-family:Georgia,serif;font-size:13px;line-height:1.85;color:var(--text);white-space:pre-wrap;margin-top:6px;padding:12px;background:var(--input);border-radius:var(--rs);border:0.5px solid var(--border);}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--rose-d);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;display:none;z-index:100;white-space:nowrap;pointer-events:none;}
+
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--rose-pale);border-top-color:var(--rose);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.ideas-bank{margin-bottom:10px;min-height:28px;}
+.idea-tag{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:20px;background:var(--input);border:0.5px solid var(--border);font-size:12px;color:var(--text);margin:3px;cursor:pointer;transition:background .15s;}
+.idea-tag.sel{background:var(--rose-pale);border-color:var(--rose);color:var(--rose-l);}
+.idea-tag .rm{color:var(--muted);font-size:13px;}
+.prompt-out{background:var(--input);border:0.5px solid var(--border);border-radius:var(--rs);padding:12px;font-size:12px;color:var(--text);line-height:1.75;white-space:pre-wrap;margin-top:12px;}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+<div id="root">
+  <div class="hdr">
+    <h1>&#9829; Our Vault</h1>
+    <p>Private memories, plans and everything in between</p>
+    <span class="sync-badge loading" id="sync-badge"><span class="spinner"></span>Connecting...</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="go('home')"><i class="ti ti-home-heart"></i>Home</button>
+    <button class="tab" onclick="go('mem')"><i class="ti ti-camera-heart"></i>Photos</button>
+    <button class="tab" onclick="go('dates')"><i class="ti ti-calendar-heart"></i>Dates</button>
+    <button class="tab" onclick="go('letters')"><i class="ti ti-mail"></i>Letters</button>
+    <button class="tab" onclick="go('songs')"><i class="ti ti-music"></i>Songs</button>
+    <button class="tab" onclick="go('love')"><i class="ti ti-heart"></i>Love</button>
+    <button class="tab" onclick="go('notes')"><i class="ti ti-message-heart"></i>Notes</button>
+    <button class="tab" onclick="go('wish')"><i class="ti ti-gift"></i>Wishes</button>
+    <button class="tab" onclick="go('ideas')"><i class="ti ti-bulb"></i>Ideas</button>
+  </div>
+
+  <!-- HOME -->
+  <div id="tab-home" class="sec active">
+    <div id="anni-box"></div>
+    <div class="row2" id="stats-box"></div>
+    <div class="card">
+      <div class="stitle">Anniversary date</div>
+      <div class="row mb">
+        <div class="col"><input type="date" id="anni-in"></div>
+        <div class="col" style="display:flex;align-items:flex-end"><button class="btn btn-r" onclick="saveAnni()" style="width:100%">Save</button></div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.65;">Everything syncs between both phones in real time via Supabase. Add a photo, leave a note, write a letter — the other person sees it the next time they open the app.</p>
+    </div>
+  </div>
+
+  <!-- PHOTOS -->
+  <div id="tab-mem" class="sec">
+    <div class="upload" onclick="document.getElementById('photo-in').click()">
+      <div class="upload-icon"><i class="ti ti-cloud-upload"></i></div>
+      <p>Tap to upload photos</p>
+      <input type="file" id="photo-in" accept="image/*" multiple style="display:none" onchange="uploadPhotos(this)">
+    </div>
+    <div class="mb"><label>Caption</label><input type="text" id="photo-cap" placeholder="What was this moment?"></div>
+    <button class="btn btn-r" onclick="document.getElementById('photo-in').click()" style="width:100%;margin-bottom:.9rem">Choose photos</button>
+    <div id="mem-grid" class="mem-grid"></div>
+    <div id="mem-empty" class="empty"><span class="empty-icon"><i class="ti ti-photo-heart"></i></span>No memories yet — upload your first photo</div>
+  </div>
+
+  <!-- DATES -->
+  <div id="tab-dates" class="sec">
+    <div class="card">
+      <div class="stitle">Add a date idea</div>
+      <div class="mb"><label>Date idea</label><input type="text" id="d-name" placeholder="Sunset picnic, midnight drive..."></div>
+      <div class="row mb">
+        <div class="col"><label>When</label><input type="date" id="d-when"></div>
+        <div class="col"><label>Priority</label>
+          <select id="d-pri"><option value="dream">Dream date</option><option value="soon">Do soon</option></select>
+        </div>
+      </div>
+      <div class="mb"><label>Notes</label><textarea id="d-notes" rows="2" placeholder="Details, ideas, what to bring..."></textarea></div>
+      <button class="btn btn-r" onclick="addDate()" style="width:100%">Add to list</button>
+    </div>
+    <div class="stitle">Date checklist</div>
+    <div id="dates-list"></div>
+    <div id="dates-empty" class="empty"><span class="empty-icon"><i class="ti ti-calendar-heart"></i></span>No dates planned yet</div>
+  </div>
+
+  <!-- LOVE LETTERS -->
+  <div id="tab-letters" class="sec">
+    <div class="card">
+      <div class="stitle">Write a love letter</div>
+      <div class="mb"><label>From</label><input type="text" id="lt-from" placeholder="Your name"></div>
+      <div class="mb"><label>Title</label><input type="text" id="lt-title" placeholder="Give it a name..."></div>
+      <div class="mb"><label>Your letter</label><textarea id="lt-body" rows="7" placeholder="Write from the heart..."></textarea></div>
+      <button class="btn btn-r" onclick="addLetter()" style="width:100%">Send letter &#9829;</button>
+    </div>
+    <div class="stitle">Letters</div>
+    <div id="letters-list"></div>
+    <div id="letters-empty" class="empty"><span class="empty-icon"><i class="ti ti-mail"></i></span>No letters yet — write the first one</div>
+  </div>
+
+  <!-- SONGS -->
+  <div id="tab-songs" class="sec">
+    <div class="card">
+      <div class="stitle">Add a song</div>
+      <div class="mb"><label>Song title</label><input type="text" id="s-title" placeholder="Song name"></div>
+      <div class="mb"><label>Artist</label><input type="text" id="s-artist" placeholder="Artist name"></div>
+      <div class="mb"><label>Why it means something</label><textarea id="s-reason" rows="2" placeholder="What does this song mean to you both?"></textarea></div>
+      <div class="mb"><label>Added by</label><input type="text" id="s-by" placeholder="Your name"></div>
+      <button class="btn btn-r" onclick="addSong()" style="width:100%">Add song</button>
+    </div>
+    <div class="stitle">Our soundtrack</div>
+    <div id="songs-list"></div>
+    <div id="songs-empty" class="empty"><span class="empty-icon"><i class="ti ti-music"></i></span>No songs yet</div>
+  </div>
+
+  <!-- LOVE NOTES -->
+  <div id="tab-love" class="sec">
+    <div class="card">
+      <div class="stitle">Things I love about you</div>
+      <div class="mb"><label>From</label><input type="text" id="lv-from" placeholder="Your name"></div>
+      <div class="mb"><label>I love that you...</label><textarea id="lv-note" rows="3" placeholder="...always know how to make me smile"></textarea></div>
+      <button class="btn btn-r" onclick="addLove()" style="width:100%">Add &#9829;</button>
+    </div>
+    <div class="stitle">Love notes</div>
+    <div id="love-list"></div>
+    <div id="love-empty" class="empty"><span class="empty-icon"><i class="ti ti-heart"></i></span>Nothing here yet</div>
+  </div>
+
+  <!-- NOTES -->
+  <div id="tab-notes" class="sec">
+    <div class="card">
+      <div class="stitle">Leave a private note</div>
+      <div class="mb"><label>From</label><input type="text" id="n-from" placeholder="Your name"></div>
+      <div class="mb"><label>Message</label><textarea id="n-text" rows="4" placeholder="Write something for them to find..."></textarea></div>
+      <button class="btn btn-r" onclick="addNote()" style="width:100%">Save note</button>
+    </div>
+    <div class="stitle">Notes</div>
+    <div id="notes-list"></div>
+    <div id="notes-empty" class="empty"><span class="empty-icon"><i class="ti ti-message-heart"></i></span>No notes yet</div>
+  </div>
+
+  <!-- WISHLIST -->
+  <div id="tab-wish" class="sec">
+    <div class="card">
+      <div class="stitle">Add to wishlist</div>
+      <div class="mb"><label>Item or idea</label><input type="text" id="w-name" placeholder="Gift, experience, place to visit..."></div>
+      <div class="row mb">
+        <div class="col"><label>For</label>
+          <select id="w-who"><option value="her">Her</option><option value="him">Him</option><option value="us">Both</option></select>
+        </div>
+        <div class="col"><label>Type</label>
+          <select id="w-type"><option value="gift">Gift</option><option value="experience">Experience</option><option value="place">Place</option></select>
+        </div>
+      </div>
+      <button class="btn btn-r" onclick="addWish()" style="width:100%">Add</button>
+    </div>
+    <div class="stitle">Wishlist</div>
+    <div id="wish-list"></div>
+    <div id="wish-empty" class="empty"><span class="empty-icon"><i class="ti ti-gift"></i></span>Nothing on the wishlist yet</div>
+  </div>
+
+  <!-- IDEAS / PROMPT BUILDER -->
+  <div id="tab-ideas" class="sec">
+    <div class="card">
+      <div class="stitle">Brainstorm date ideas</div>
+      <div class="row mb">
+        <div class="col" style="flex:3"><label>Idea</label><input type="text" id="idea-in" placeholder="Night drive with a playlist..." onkeydown="if(event.key==='Enter')addIdea()"></div>
+        <div class="col" style="flex:1;display:flex;align-items:flex-end"><button class="btn btn-r" onclick="addIdea()" style="width:100%">Add</button></div>
+      </div>
+      <div class="ideas-bank" id="ideas-bank"></div>
+    </div>
+    <div class="card">
+      <div class="stitle">Build a date prompt</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Select ideas above, choose a vibe, get a prompt to paste into any AI for a full date plan.</p>
+      <div class="row mb">
+        <div class="col"><label>Vibe</label>
+          <select id="p-mood"><option>Romantic and intimate</option><option>Adventure and exciting</option><option>Chill and relaxed</option><option>Creative and fun</option><option>Special occasion</option></select>
+        </div>
+        <div class="col"><label>Budget</label>
+          <select id="p-budget"><option>Free or cheap</option><option>Mid-range</option><option>Treat yourselves</option></select>
+        </div>
+      </div>
+      <div class="mb"><label>Extra context</label><input type="text" id="p-extra" placeholder="We're in Devon, she loves surprises..."></div>
+      <button class="btn btn-r" onclick="genPrompt()" style="width:100%">Generate prompt</button>
+      <div id="p-out" class="prompt-out" style="display:none"></div>
+      <button id="copy-btn" class="btn btn-g" onclick="copyPrompt()" style="display:none;width:100%;margin-top:8px"><i class="ti ti-copy"></i> Copy prompt</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB = 'https://ovgxoyodgrdxdhypmlpd.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92Z3hveW9kZ3JkeGRoeXBtbHBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NjI2OTksImV4cCI6MjA5ODMzODY5OX0.k6luRf0GtxNOW6SD8M7LTaQ3PZ9u2BB3vjdnz8lwPs4';
+const H = {'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY,'Prefer':'return=representation'};
+
+async function db(method,table,body,q=''){
+  const r=await fetch(`${SB}/rest/v1/${table}${q||'?order=created_at.desc'}`,{method,headers:H,body:body?JSON.stringify(body):undefined});
+  if(!r.ok) throw new Error(await r.text());
+  const t=await r.text();return t?JSON.parse(t):[];
+}
+const GET=(t,q)=>db('GET',t,null,q);
+const POST=(t,b)=>db('POST',t,b);
+const PATCH=(t,id,b)=>db('PATCH',t,b,`?id=eq.${id}`);
+const DEL=(t,id)=>db('DELETE',t,null,`?id=eq.${id}`);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const fmtd=s=>s?new Date(s).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+const fmt=s=>s?new Date(s).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+let S={memories:[],dates:[],letters:[],songs:[],love:[],notes:[],wishlist:[],ideas:[],anni:'',selIdeas:new Set()};
+let toastT;
+
+function badge(cls,txt){const e=document.getElementById('sync-badge');e.className='sync-badge '+cls;e.innerHTML=txt;}
+function toast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>t.style.display='none',2400);}
+
+async function loadAll(){
+  badge('loading','<span class="spinner"></span> Loading...');
+  try {
+    const [m,d,l,s,lv,n,w,id]=await Promise.all([
+      GET('memories'),GET('dates'),GET('love_letters'),GET('songs'),
+      GET('love_notes'),GET('messages'),GET('wishlist'),GET('ideas')
+    ]);
+    S.memories=m;S.dates=d;S.letters=l;S.songs=s;S.love=lv;S.notes=n;S.wishlist=w;S.ideas=id;
+    try{const a=await GET('settings','?key=eq.anniversary');S.anni=a[0]?.value||'';}catch(e){}
+    badge('','Synced &#10003;');
+    renderAll();
+  } catch(e){badge('err','Connection error — check your internet');}
+}
+
+function renderAll(){renderHome();renderMem();renderDates();renderLetters();renderSongs();renderLove();renderNotes();renderWish();renderIdeas();}
+
+function go(name){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>{if(t.getAttribute('onclick')&&t.getAttribute('onclick').includes("'"+name+"'"))t.classList.add('active');});
+  window.scrollTo(0,0);
+}
+
+async function saveAnni(){
+  const v=document.getElementById('anni-in').value;if(!v)return;
+  try{
+    try{await POST('settings',{key:'anniversary',value:v});}catch(e){await PATCH('settings','anniversary',{value:v});}
+    S.anni=v;renderHome();toast('Anniversary saved &#9829;');
+  }catch(e){toast('Error saving');}
+}
+
+function renderHome(){
+  const box=document.getElementById('anni-box');
+  if(S.anni){
+    const days=Math.floor((Date.now()-new Date(S.anni))/86400000);
+    const next=new Date(S.anni);next.setFullYear(new Date().getFullYear());if(next<new Date())next.setFullYear(new Date().getFullYear()+1);
+    const d2=Math.ceil((next-new Date())/86400000);
+    box.innerHTML=`<div class="anni"><div class="anni-n">${days}</div><div class="anni-l">days together &#9829;<br>${d2} days until your next anniversary</div></div>`;
+    document.getElementById('anni-in').value=S.anni;
+  } else box.innerHTML='';
+  const done=S.dates.filter(d=>d.done).length;
+  document.getElementById('stats-box').innerHTML=`
+    <div class="stat"><div class="stat-n">${S.memories.length}</div><div class="stat-l">MEMORIES</div></div>
+    <div class="stat"><div class="stat-n">${S.dates.length}</div><div class="stat-l">DATE IDEAS</div></div>
+    <div class="stat"><div class="stat-n">${done}</div><div class="stat-l">DATES DONE</div></div>
+    <div class="stat"><div class="stat-n">${S.letters.length}</div><div class="stat-l">LETTERS</div></div>
+    <div class="stat"><div class="stat-n">${S.songs.length}</div><div class="stat-l">SONGS</div></div>
+    <div class="stat"><div class="stat-n">${S.love.length}</div><div class="stat-l">LOVE NOTES</div></div>`;
+}
+
+async function uploadPhotos(input){
+  const cap=document.getElementById('photo-cap').value||'';
+  badge('loading','<span class="spinner"></span> Uploading...');
+  for(const f of Array.from(input.files)){
+    await new Promise(res=>{
+      const r=new FileReader();
+      r.onload=async e=>{
+        try{const [row]=await POST('memories',{id:uid(),src:e.target.result,caption:esc(cap)});S.memories.unshift(row);}catch(err){}
+        res();
+      };r.readAsDataURL(f);
+    });
+  }
+  input.value='';document.getElementById('photo-cap').value='';
+  badge('','Synced &#10003;');renderMem();toast('Photos saved');
+}
+
+function renderMem(){
+  const g=document.getElementById('mem-grid'),e=document.getElementById('mem-empty');
+  if(!S.memories.length){g.innerHTML='';e.style.display='';return;}
+  e.style.display='none';
+  g.innerHTML=S.memories.map(m=>`<div class="mem-wrap"><img src="${m.src}" alt="${m.caption||'Memory'}" loading="lazy">${m.caption?`<div class="mem-cap">${m.caption}</div>`:''}<button class="mem-del" onclick="delMem('${m.id}')">&#10005;</button></div>`).join('');
+}
+async function delMem(id){try{await DEL('memories',id);S.memories=S.memories.filter(m=>m.id!==id);renderMem();toast('Removed');}catch(e){}}
+
+async function addDate(){
+  const n=document.getElementById('d-name').value.trim();if(!n)return;
+  try{
+    const [row]=await POST('dates',{id:uid(),name:esc(n),when_date:document.getElementById('d-when').value,priority:document.getElementById('d-pri').value,notes:esc(document.getElementById('d-notes').value.trim()),done:false});
+    S.dates.unshift(row);
+    ['d-name','d-when','d-notes'].forEach(id=>document.getElementById(id).value='');
+    renderDates();toast('Date added');
+  }catch(e){toast('Error saving');}
+}
+async function toggleDate(id,done){try{await PATCH('dates',id,{done});const d=S.dates.find(x=>x.id===id);if(d)d.done=done;renderDates();}catch(e){}}
+async function delDate(id){try{await DEL('dates',id);S.dates=S.dates.filter(d=>d.id!==id);renderDates();toast('Removed');}catch(e){}}
+function renderDates(){
+  const l=document.getElementById('dates-list'),e=document.getElementById('dates-empty');
+  if(!S.dates.length){l.innerHTML='';e.style.display='';return;}
+  e.style.display='none';
+  l.innerHTML=[...S.dates].sort((a,b)=>a.done-b.done).map(d=>`
+    <div class="item" style="${d.done?'opacity:.55':''}">
+      <div style="display:flex;align-items:flex-start;gap:9px">
+        <input type="checkbox" class="cb" ${d.done?'checked':''} onchange="toggleDate('${d.id}',this.checked)">
+        <div style="flex:1;min-width:0">
+          <div class="item-title" style="${d.done?'text-decoration:line-through':''}">${d.name}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${d.when_date?fmtd(d.when_date)+' &middot; ':''}<span class="pill ${d.done?'p-done':'p-'+d.priority}">${d.done?'Done &#10003;':d.priority==='dream'?'Dream date':'Do soon'}</span></div>
+          ${d.notes?`<div style="font-size:12px;color:var(--muted);margin-top:3px">${d.notes}</div>`:''}
+        </div>
+        <button class="btn-d" onclick="delDate('${d.id}')">&#10005;</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addLetter(){
+  const f=document.getElementById('lt-from').value.trim(),b=document.getElementById('lt-body').value.trim();
+  if(!f||!b)return;
+  try{
+    const [row]=await POST('love_letters',{id:uid(),from_name:esc(f),title:esc(document.getElementById('lt-title').value.trim()||'Untitled'),body:esc(b)});
+    S.letters.unshift(row);
+    ['lt-from','lt-title','lt-body'].forEach(id=>document.getElementById(id).value='');
+    renderLetters();toast('Letter sent &#9829;');
+  }catch(e){toast('Error saving');}
+}
+async function delLetter(id){try{await DEL('love_letters',id);S.letters=S.letters.filter(l=>l.id!==id);renderLetters();}catch(e){}}
+function renderLetters(){
+  const l=document.getElementById('letters-list'),e=document.getElementById('letters-empty');
+  if(!S.letters.length){l.innerHTML='';e.style.display='';return;}
+  e.style.display='none';
+  l.innerHTML=S.letters.map(lt=>`
+    <div class="item">
+      <div class="from">&#9829; From ${lt.from_name}</div>
+      <div style="font-size:13px;font-weight:500;color:var(--rose-l);font-family:Georgia,serif;margin-bottom:5px">${lt.title}</div>
+      <div class="letter-body">${lt.body}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:7px">
+        <div class="ts">${fmtd(lt.created_at)}</div>
+        <button class="btn-d" onclick="delLetter('${lt.id}')">&#10005;</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addSong(){
+  const ti=document.getElementById('s-title').value.trim(),ar=document.getElementById('s-artist').value.trim();
+  if(!ti||!ar)return;
+  try{
+    const [row]=await POST('songs',{id:uid(),title:esc(ti),artist:esc(ar),reason:esc(document.getElementById('s-reason').value.trim()),added_by:esc(document.getElementById('s-by').value.trim()||'Unknown')});
+    S.songs.unshift(row);
+    ['s-title','s-artist','s-reason','s-by'].forEach(id=>document.getElementById(id).value='');
+    renderSongs();toast('Song added');
+  }catch(e){toast('Error saving');}
+}
+async function delSong(id){try{await DEL('songs',id);S.songs=S.songs.filter(s=>s.id!==id);renderSongs();}catch(e){}}
+function renderSongs(){
+  const l=document.getElementById('songs-list'),e=document.getElementById('songs-empty');
+  if(!S.songs.length){l.innerHTML='';e.style.display='';return;}
+  e.style.display='none';
+  l.innerHTML=S.songs.map(s=>`
+    <div class="item">
+      <div class="song-item">
+        <div class="song-icon"><i class="ti ti-music"></i></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:500;color:var(--text)">${s.title}</div>
+          <div style="font-size:12px;color:var(--rose-l)">${s.artist}</div>
+          ${s.reason?`<div style="font-size:12px;color:var(--muted);margin-top:3px;font-style:italic">"${s.reason}"</div>`:''}
+          <div class="ts">Added by ${s.added_by} &middot; ${fmtd(s.created_at)}</div>
+        </div>
+        <button class="btn-d" onclick="delSong('${s.id}')">&#10005;</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addLove(){
+  const f=document.getElementById('lv-from').value.trim(),n=document.getElementById('lv-note').value.trim();
+  if(!f||!n)return;
+  try{
+    const [row]=await POST('love_notes',{id:uid(),from_name:esc(f),note:esc(n)});
+    S.love.unshift(row);
+    ['lv-from','lv-note'].forEach(id=>document.getElementById(id).value='');
+    renderLove();toast('Added &#9829;');
+  }catch(e){toast('Error saving');}
+}
+async function delLove(id){try{await DEL('love_notes',id);S.love=S.love.filter(l=>l.id!==id);renderLove();}catch(e){}}
+function renderLove(){
+  const l=document.getElementById('love-list'),e=document.getElementById('love-empty');
+  if(!S.love.length){l.innerHTML='';e.style.display='';return;}
+  e.style.display='none';
+  l.innerHTML=S.love.map(lv=>`
+    <div class="item">
+      <div class="from">&#9829; From ${lv.from_name}</div>
+      <div class="body-text">${lv.note}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+        <div class="ts">${fmtd(lv.created_at)}</div>
+        <button class="btn-d" onclick="delLove('${lv.id}')">&#10005;</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addNote(){
+  const f=document.getElementById('n-from').value.trim(),t=document.getElementById('n-text').value.trim();
+  if(!f||!t)return;
+  try{
+    const [row]=await POST('messages',{id:uid(),from_name:esc(f),message:esc(t)});
+    S.notes.unshift(row);
+    ['n-from','n-text'].forEach(id=>document.getElementById(id).value='');
+    renderNotes();toast('Note saved');
+  }catch(e){toast('Error saving');}
+}
+async function delNote(id){try{await DEL('messages',id);S.notes=S.notes.filter(n=>n.id!==id);renderNotes();}catch(e){}}
+function renderNotes(){
+  const l=document.getElementById('notes-list'),e=document.getElementById('notes-empty');
+  if(!S.notes.length){l.innerHTML='';e.style.display='';return;}
+  e.style.display='none';
+  l.innerHTML=S.notes.map(n=>`
+    <div class="item">
+      <div class="from">&#9829; From ${n.from_name}</div>
+      <div class="body-text">${n.message}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+        <div class="ts">${fmt(n.created_at)}</div>
+        <button class="btn-d" onclick="delNote('${n.id}')">&#10005;</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addWish(){
+  const n=document.getElementById('w-name').value.trim();if(!n)return;
+  try{
+    const [row]=await POST('wishlist',{id:uid(),name:esc(n),who_for:document.getElementById('w-who').value,type:document.getElementById('w-type').value,claimed:false});
+    S.wishlist.unshift(row);document.getElementById('w-name').value='';
+    renderWish();toast('Added to wishlist');
+  }catch(e){toast('Error saving');}
+}
+async function toggleWish(id,claimed){try{await PATCH('wishlist',id,{claimed});const w=S.wishlist.find(x=>x.id===id);if(w)w.claimed=claimed;renderWish();}catch(e){}}
+async function delWish(id){try{await DEL('wishlist',id);S.wishlist=S.wishlist.filter(w=>w.id!==id);renderWish();}catch(e){}}
+function renderWish(){
+  const l=document.getElementById('wish-list'),e=document.getElementById('wish-empty');
+  if(!S.wishlist.length){l.innerHTML='';e.style.display='';return;}
+  e.style.display='none';
+  const wm={her:'For her',him:'For him',us:'For both'},tm={gift:'Gift',experience:'Experience',place:'Place'};
+  l.innerHTML='<div class="card" style="padding:.5rem .75rem">'+S.wishlist.map(w=>`
+    <div class="wish-row">
+      <input type="checkbox" class="wish-cb" ${w.claimed?'checked':''} onchange="toggleWish('${w.id}',this.checked)">
+      <div style="flex:1;min-width:0;${w.claimed?'opacity:.45;text-decoration:line-through':''}">
+        <div style="font-size:13px;color:var(--text)">${w.name}</div>
+        <div style="font-size:11px;color:var(--rose-l)">${wm[w.who_for]||w.who_for} &middot; ${tm[w.type]||w.type}</div>
+      </div>
+      <button class="btn-d" onclick="delWish('${w.id}')">&#10005;</button>
+    </div>`).join('')+'</div>';
+}
+
+async function addIdea(){
+  const input=document.getElementById('idea-in'),v=input.value.trim();if(!v)return;
+  try{
+    const [row]=await POST('ideas',{id:uid(),text:esc(v)});
+    S.ideas.unshift(row);input.value='';renderIdeas();
+  }catch(e){toast('Error saving');}
+}
+function toggleIdea(id){if(S.selIdeas.has(id))S.selIdeas.delete(id);else S.selIdeas.add(id);renderIdeas();}
+async function delIdea(id){try{await DEL('ideas',id);S.ideas=S.ideas.filter(i=>i.id!==id);S.selIdeas.delete(id);renderIdeas();}catch(e){}}
+function renderIdeas(){
+  const b=document.getElementById('ideas-bank');
+  b.innerHTML=S.ideas.map(i=>`<span class="idea-tag ${S.selIdeas.has(i.id)?'sel':''}" onclick="toggleIdea('${i.id}')">${i.text}<span class="rm" onclick="event.stopPropagation();delIdea('${i.id}')"> &#10005;</span></span>`).join('');
+}
+function genPrompt(){
+  const sel=S.ideas.filter(i=>S.selIdeas.has(i.id)).map(i=>i.text);
+  const mood=document.getElementById('p-mood').value,budget=document.getElementById('p-budget').value,extra=document.getElementById('p-extra').value.trim();
+  let p=`Plan a perfect date for a couple.\nVibe: ${mood}. Budget: ${budget}.`;
+  if(sel.length)p+=`\n\nIdeas to incorporate:\n${sel.map(s=>'- '+s).join('\n')}`;
+  if(extra)p+=`\n\nExtra context: ${extra}`;
+  p+=`\n\nGive a detailed date plan with timing, locations, what to bring, how to make it feel special, and a surprise element.`;
+  const o=document.getElementById('p-out');o.style.display='';o.textContent=p;
+  document.getElementById('copy-btn').style.display='';
+}
+function copyPrompt(){
+  navigator.clipboard.writeText(document.getElementById('p-out').textContent).then(()=>{
+    const b=document.getElementById('copy-btn');b.innerHTML='<i class="ti ti-check"></i> Copied';
+    setTimeout(()=>b.innerHTML='<i class="ti ti-copy"></i> Copy prompt',2000);
+  });
+}
+
+loadAll();
+</script>
+</body>
+</html>
